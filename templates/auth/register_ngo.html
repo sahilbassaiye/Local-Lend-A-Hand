@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}NGO Registration & Darpan Verification | Local Lend a Hand{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card card-custom p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="fs-1">🏛️</span>
+                    <h3 class="fw-bold mt-2 mb-1">Register Organization</h3>
+                    <p class="text-muted small">Post community service drives, engage verified volunteers, and track cumulative man-hours.</p>
+                </div>
+
+                <div class="alert alert-warning border small mb-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-shield-alt text-warning fs-5"></i>
+                        <div>
+                            <b>Mandatory Verification:</b> In accordance with NITI Aayog guidelines, all NGOs must provide their valid <b>NGO Darpan ID</b> (format: <code>DL/2020/0123456</code>) to list volunteering events.
+                        </div>
+                    </div>
+                </div>
+
+                <form onsubmit="handleNGORegister(event)">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Organization Name *</label>
+                        <input type="text" class="form-control" name="organization_name" required placeholder="e.g. Green Earth Trust">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small d-flex justify-content-between">
+                            <span>NGO Darpan Unique ID *</span>
+                            <span class="badge bg-light text-muted border">Format: STATE/YEAR/7-DIGITS</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="fas fa-shield-alt text-warning"></i></span>
+                            <input type="text" class="form-control text-uppercase font-monospace" name="darpan_id" required placeholder="e.g. MH/2021/0091827" oninput="checkDarpanIdRealtime(this)">
+                        </div>
+                        <div id="darpan-feedback"></div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">Official Email Address *</label>
+                            <input type="email" class="form-control" name="email" required placeholder="contact@organization.org">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">Password *</label>
+                            <input type="password" class="form-control" name="password" required minlength="6">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">Contact Phone Number *</label>
+                            <input type="tel" class="form-control" name="contact_phone" required placeholder="+91 98765 43210">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">Website (Optional)</label>
+                            <input type="url" class="form-control" name="website" placeholder="https://example.org">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Headquarters Address *</label>
+                        <input type="text" class="form-control" name="address" required placeholder="Full street address and city">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Mission Statement *</label>
+                        <textarea class="form-control" name="mission_statement" rows="3" required placeholder="Describe your organization's core purpose and community focus..."></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small">History & Past Impact (Optional)</label>
+                        <textarea class="form-control" name="history_and_impact" rows="2" placeholder="Key past achievements, number of beneficiaries impacted, etc."></textarea>
+                    </div>
+
+                    <input type="hidden" name="latitude" value="28.6139">
+                    <input type="hidden" name="longitude" value="77.2090">
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold rounded-pill">
+                        <i class="fas fa-check-circle me-1"></i> Verify Darpan ID & Register Organization
+                    </button>
+                </form>
+
+                <div class="text-center mt-4 small">
+                    Already registered? <a href="/auth/login/" class="text-primary fw-bold text-decoration-none">Sign In</a> &bull; 
+                    <a href="/auth/register/volunteer/" class="text-success fw-bold text-decoration-none">Join as Volunteer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

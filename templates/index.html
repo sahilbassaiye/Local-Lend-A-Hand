@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Local Lend a Hand | Two-Sided Civic Volunteering Marketplace{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="py-5 bg-white border-bottom">
+    <div class="container py-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="d-inline-flex align-items-center gap-2 bg-emerald-50 text-emerald px-3 py-1 rounded-pill small fw-bold mb-3 border border-emerald-400">
+                    <span class="live-pulse-dot"></span> PostGIS Proximity Engine &bull; Strava-Style Volunteering
+                </div>
+                <h1 class="display-4 fw-extrabold text-dark tracking-tight mb-3">
+                    Turn Local Action into <span class="text-emerald-600">Verified Community Impact</span>.
+                </h1>
+                <p class="lead text-muted mb-4 fs-6">
+                    A modern two-sided marketplace connecting passionate volunteers with verified NGOs. Discover nearby drives with spatial GPS intelligence, log verified hours like Strava, and showcase your milestones.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    {% if request.user.is_authenticated %}
+                        {% if request.user.role == 'VOLUNTEER' %}
+                            <a href="/volunteer/dashboard/" class="btn btn-emerald btn-lg px-4 fw-bold rounded-pill shadow-sm">
+                                <i class="fas fa-compass me-2"></i> Enter Volunteer Hub
+                            </a>
+                        {% else %}
+                            <a href="/ngo/dashboard/" class="btn btn-emerald btn-lg px-4 fw-bold rounded-pill shadow-sm">
+                                <i class="fas fa-building me-2"></i> Enter NGO Portal
+                            </a>
+                        {% endif %}
+                        <a href="/community/" class="btn btn-strava btn-lg px-4 fw-bold rounded-pill">
+                            <i class="fas fa-fire me-2"></i> Community Feed
+                        </a>
+                    {% else %}
+                        <a href="/auth/login/?role=volunteer" class="btn btn-emerald btn-lg px-4 fw-bold rounded-pill shadow-sm">
+                            <i class="fas fa-user me-2"></i> Volunteer Access
+                        </a>
+                        <a href="/auth/login/?role=ngo" class="btn btn-slate-pill btn-lg px-4 fw-bold text-white shadow-sm">
+                            <i class="fas fa-building me-2 text-amber"></i> NGO Portal Access
+                        </a>
+                        <a href="/community/" class="btn btn-outline-dark btn-lg px-4 fw-bold rounded-pill">
+                            <i class="fas fa-users me-2"></i> Community
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <!-- Interactive Strava Preview Card -->
+                <div class="strava-activity-card shadow-lg p-0 m-0">
+                    <div class="strava-card-header">
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=60&auto=format&fit=crop&q=80" class="rounded-circle" width="40" height="40">
+                            <div>
+                                <div class="fw-bold text-dark">Om Sharma</div>
+                                <div class="fs-8 text-muted"><i class="fas fa-check-circle text-success"></i> GPS Geofence Verified</div>
+                            </div>
+                        </div>
+                        <span class="badge bg-success text-white"><i class="fas fa-bolt"></i> Strava Card</span>
+                    </div>
+                    <div class="strava-card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="strava-hours-hero">
+                                <span class="strava-hours-num">4.0</span>
+                                <span class="strava-hours-label">Hours Donated</span>
+                            </div>
+                            <span class="badge bg-warning text-dark px-3 py-2 fw-bold"><i class="fas fa-fire text-danger"></i> 4 Day Streak</span>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Yamuna River Clean-up Drive</h5>
+                        <div class="small text-muted mb-2">Green Earth Trust &bull; <span class="badge-darpan py-0 px-2 fs-9"><i class="fas fa-shield-alt"></i> DL/2021/0091827</span></div>
+                        <p class="small text-muted mb-0 fst-italic">"Our squad collected 35 sacks of plastic waste from the bank!"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Platform Impact Numbers -->
+<div class="container py-5">
+    <div class="row g-4 text-center">
+        <div class="col-md-4">
+            <div class="card card-custom p-4">
+                <div class="text-emerald mb-2 fs-1"><i class="fas fa-stopwatch"></i></div>
+                <div class="fs-1 fw-extrabold text-dark font-monospace">{{ total_hours }} hrs</div>
+                <div class="text-muted fw-semibold small text-uppercase">Verified Volunteer Hours</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-custom p-4">
+                <div class="text-primary mb-2 fs-1"><i class="fas fa-hands-helping"></i></div>
+                <div class="fs-1 fw-extrabold text-dark font-monospace">{{ total_volunteers }}</div>
+                <div class="text-muted fw-semibold small text-uppercase">Active Volunteers</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-custom p-4">
+                <div class="text-amber mb-2 fs-1"><i class="fas fa-shield-alt"></i></div>
+                <div class="fs-1 fw-extrabold text-dark font-monospace">{{ total_ngos }}</div>
+                <div class="text-muted fw-semibold small text-uppercase">Verified NGOs (Darpan Certified)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Drives Showcase -->
+    <div class="mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-extrabold mb-1">Active Community Drives</h3>
+                <p class="text-muted mb-0 small">Discovered dynamically via PostGIS spatial indexing</p>
+            </div>
+            <a href="/volunteer/dashboard/" class="btn btn-outline-success fw-bold rounded-pill">
+                Explore on Interactive Map <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for event in featured_events %}
+            <div class="col-md-6 col-lg-3">
+                <div class="card card-custom h-100 overflow-hidden">
+                    <img src="{{ event.banner_image_url }}" class="card-img-top" style="height: 155px; object-fit: cover;" alt="{{ event.title }}">
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-success-subtle text-success mb-2 align-self-start fs-8">{{ event.get_category_display }}</span>
+                        <h6 class="fw-bold text-dark mb-1">{{ event.title }}</h6>
+                        <div class="small text-muted mb-2"><i class="fas fa-building text-primary"></i> {{ event.ngo.organization_name }}</div>
+                        <div class="small text-muted mb-3"><i class="fas fa-map-marker-alt text-danger"></i> {{ event.address|truncatechars:38 }}</div>
+                        <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
+                            <small class="text-muted fs-8">{{ event.headcount_applied }} / {{ event.headcount_needed }} spots</small>
+                            <a href="/volunteer/dashboard/" class="btn btn-sm btn-emerald rounded-pill px-3 fw-bold">Sign Up</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

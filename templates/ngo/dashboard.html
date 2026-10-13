@@ -1,0 +1,520 @@
+{% extends 'base.html' %}
+
+{% block title %}NGO Portal & Live Event Tracking | Local Lend a Hand{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header Action Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3 bg-white p-4 rounded-4 border shadow-sm">
+        <div class="d-flex align-items-center gap-3">
+            <div class="avatar-circle-sm bg-amber text-dark fs-5 p-3 rounded-3" style="width:52px;height:52px;">
+                <i class="fas fa-building"></i>
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h3 class="fw-extrabold text-dark mb-0">{{ ngo.organization_name|default:"Care India Foundation" }}</h3>
+                    <span class="role-chip role-chip-ngo">NGO Portal</span>
+                    <span class="badge-darpan"><i class="fas fa-shield-alt"></i> Darpan: {{ ngo.darpan_id|default:"DL/2019/0182736" }}</span>
+                </div>
+                <div class="text-muted small">
+                    <i class="fas fa-check-circle text-success me-1"></i> NITI Aayog Verified &bull; 
+                    <span class="fw-bold text-dark">{{ ngo.total_man_hours_received|default:"148.5" }} hrs</span> cumulative impact &bull; 
+                    <span>HQ: {{ ngo.address|default:"New Delhi" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW EVENT BUTTON (Explicitly requested by user) -->
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-emerald btn-lg fw-bold rounded-pill px-4 shadow-sm" onclick="document.getElementById('post-drive-tab').click()">
+                <i class="fas fa-plus-circle me-2"></i> + Post New Drive
+            </button>
+            <a href="/ngo/profile/{{ ngo.id|default:1 }}/" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                <i class="fas fa-external-link-alt me-1"></i> Public Page
+            </a>
+            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="switchDemoPersona('VOLUNTEER')">
+                <i class="fas fa-user me-1"></i> Volunteer View
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="ngoTabs" role="tablist">
+        <!-- 1. Live Current Event Tracking Option (Requested by user) -->
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="live-tracking-tab" data-bs-toggle="tab" data-bs-target="#live-tracking-content" type="button" role="tab">
+                <span class="live-pulse-dot me-1"></span> Current Event Tracking
+            </button>
+        </li>
+        <!-- 2. Post New Drive Option (Requested by user) -->
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="post-drive-tab" data-bs-toggle="tab" data-bs-target="#post-drive-content" type="button" role="tab">
+                <i class="fas fa-plus-circle text-emerald me-2"></i> Post New Drive (Map Picker)
+            </button>
+        </li>
+        <!-- 3. Impact Analytics & Reach -->
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics-content" type="button" role="tab">
+                <i class="fas fa-chart-line text-primary me-2"></i> Impact Analytics & Reach
+            </button>
+        </li>
+        <!-- 4. Profile & Mission -->
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-content" type="button" role="tab">
+                <i class="fas fa-building text-amber me-2"></i> Organization Mission & History
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Contents -->
+    <div class="tab-content" id="ngoTabsContent">
+        
+        <!-- ==================== TAB 1: CURRENT EVENT TRACKING OPTION ==================== -->
+        <div class="tab-pane fade show active" id="live-tracking-content" role="tabpanel">
+            <!-- Active Drive Banner -->
+            <div class="card card-custom p-4 mb-4 bg-slate-900 text-white border-slate-800">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="live-pulse-dot"></span>
+                            <span class="badge bg-success text-white fw-bold"><i class="fas fa-broadcast-tower"></i> LIVE EVENT TRACKING CONSOLE</span>
+                            <span class="badge bg-slate-800 text-slate-300 border border-slate-700">Geofence Verified</span>
+                        </div>
+                        <h3 class="fw-extrabold text-white mb-1">{{ active_event.title|default:"Yamuna River Clean-up & Plastic Segregation Drive" }}</h3>
+                        <div class="text-slate-400 small">
+                            <i class="fas fa-map-marker-alt text-danger me-1"></i> {{ active_event.address|default:"Kashmere Gate Yamuna Ghat, Ring Road, Delhi" }} &bull; 
+                            <i class="fas fa-clock text-primary me-1"></i> Today, 09:00 AM – 01:00 PM
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-4">
+                        <div class="text-center p-3 bg-slate-800 rounded-3 border border-slate-700">
+                            <div class="fs-9 text-slate-400 text-uppercase fw-bold">Live On Site</div>
+                            <div class="fs-2 fw-extrabold text-emerald font-monospace">18 <span class="fs-6 text-slate-400">/ 25</span></div>
+                        </div>
+                        <div class="text-center p-3 bg-slate-800 rounded-3 border border-slate-700">
+                            <div class="fs-9 text-slate-400 text-uppercase fw-bold">Hours Today</div>
+                            <div class="fs-2 fw-extrabold text-amber font-monospace">45.0 <span class="fs-6 text-slate-400">hrs</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Live Map Column -->
+                <div class="col-lg-7">
+                    <div class="card card-custom p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h5 class="fw-bold text-dark mb-0"><i class="fas fa-satellite-dish text-emerald me-2"></i> Live On-Site Map & Geofence</h5>
+                                <div class="text-muted small">Green circle marks the {{ active_event.geofence_radius_meters|default:300 }}m check-in perimeter</div>
+                            </div>
+                            <span class="badge bg-emerald-subtle text-success fs-8">Live Attendees Pin-Mapped</span>
+                        </div>
+
+                        <!-- Live NGO Tracking Map -->
+                        <div id="ngo-live-tracker-map" class="map-progress-container mb-3"></div>
+
+                        <div class="d-flex justify-content-between align-items-center text-muted small p-2 bg-light rounded border">
+                            <span><i class="fas fa-flag text-dark me-1"></i> Drive Site ({{ active_event.latitude|default:"28.6500" }}, {{ active_event.longitude|default:"77.2410" }})</span>
+                            <span><i class="fas fa-check text-success me-1"></i> 18 Volunteers inside 300m perimeter</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Attendees Roster Column -->
+                <div class="col-lg-5">
+                    <div class="card card-custom p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold text-dark mb-0"><i class="fas fa-users text-primary me-2"></i> On-Site Attendee Roster</h5>
+                            <span class="badge bg-success">18 Checked In</span>
+                        </div>
+
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            <!-- Volunteer 1: Om Sharma -->
+                            <div class="p-3 bg-light rounded-3 border mb-2 d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=60&auto=format&fit=crop&q=80" class="rounded-circle" width="38" height="38">
+                                    <div>
+                                        <div class="fw-bold text-dark small">Om Sharma</div>
+                                        <div class="fs-8 text-muted">Checked in: <b>09:00 AM</b> (2.5h on site)</div>
+                                    </div>
+                                </div>
+                                <span class="badge bg-success-subtle text-success fs-8"><i class="fas fa-check-circle"></i> 24m &bull; Verified</span>
+                            </div>
+
+                            <!-- Volunteer 2: Priya Patel -->
+                            <div class="p-3 bg-light rounded-3 border mb-2 d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80" class="rounded-circle" width="38" height="38">
+                                    <div>
+                                        <div class="fw-bold text-dark small">Priya Patel</div>
+                                        <div class="fs-8 text-muted">Checked in: <b>09:15 AM</b> (2.2h on site)</div>
+                                    </div>
+                                </div>
+                                <span class="badge bg-success-subtle text-success fs-8"><i class="fas fa-check-circle"></i> 45m &bull; Verified</span>
+                            </div>
+
+                            <!-- Volunteer 3: Aarav Mehta -->
+                            <div class="p-3 bg-light rounded-3 border mb-2 d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar-circle-sm bg-primary text-white" style="width:38px;height:38px;">AM</div>
+                                    <div>
+                                        <div class="fw-bold text-dark small">Aarav Mehta</div>
+                                        <div class="fs-8 text-muted">Checked in: <b>09:30 AM</b> (2.0h on site)</div>
+                                    </div>
+                                </div>
+                                <span class="badge bg-success-subtle text-success fs-8"><i class="fas fa-check-circle"></i> 18m &bull; Verified</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto pt-3 border-top">
+                            <button class="btn btn-outline-primary btn-sm w-100 rounded-pill mb-2" onclick="showToast('Broadcast notice sent to all 18 checked-in volunteers!', 'info')">
+                                <i class="fas fa-bullhorn me-1"></i> Broadcast Update to Attendees
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 2: POST NEW DRIVE (MAP PICKER ENGINE) ==================== -->
+        <div class="tab-pane fade" id="post-drive-content" role="tabpanel">
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card card-custom p-4">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h5 class="fw-bold text-dark mb-0"><i class="fas fa-plus-circle text-emerald me-2"></i> Create New Volunteering Drive</h5>
+                        </div>
+                        <p class="text-muted small mb-4">Set headcount, required skills, and click or drag on the map to set exact coordinates.</p>
+
+                        <form id="create-event-form" onsubmit="handleCreateDrive(event)">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Drive Title *</label>
+                                <input type="text" class="form-control" name="title" required placeholder="e.g. Slum School Book Donation & Tutoring">
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small">Category *</label>
+                                    <select class="form-select" name="category" required>
+                                        <option value="ENVIRONMENT">Environment & Conservation</option>
+                                        <option value="EDUCATION">Education & Literacy</option>
+                                        <option value="HEALTH">Health & Sanitation</option>
+                                        <option value="ANIMAL_WELFARE">Animal Welfare</option>
+                                        <option value="FOOD_HUNGER">Food & Hunger</option>
+                                        <option value="COMMUNITY" selected>Community Development</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small">Headcount Needed *</label>
+                                    <input type="number" class="form-control" name="headcount_needed" value="15" min="1" max="500" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Required Skills (Comma separated)</label>
+                                <input type="text" class="form-control" name="required_skills" value="Teaching, Storytelling, Organizing" placeholder="e.g. Cleanups, First Aid">
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small">Start Date & Time *</label>
+                                    <input type="datetime-local" class="form-control" name="start_time" required id="id_start_time">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small">End Date & Time *</label>
+                                    <input type="datetime-local" class="form-control" name="end_time" required id="id_end_time">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Venue Address / Landmark *</label>
+                                <input type="text" class="form-control" name="address" id="id_address" required placeholder="Full street address or site name">
+                            </div>
+
+                            <!-- Hidden inputs synced with Map Picker -->
+                            <input type="hidden" name="latitude" id="id_latitude" value="28.6139">
+                            <input type="hidden" name="longitude" id="id_longitude" value="77.2090">
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small d-flex justify-content-between">
+                                    <span>Geofence Radius Perimeter</span>
+                                    <span id="radius-value-label" class="text-emerald fw-bold">250 meters</span>
+                                </label>
+                                <input type="range" class="form-range" id="id_geofence_radius" name="geofence_radius_meters" min="100" max="1000" step="50" value="250">
+                                <div class="form-text fs-8">Volunteers must be within this perimeter to check in via Strava GPS.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold small">Mission & Drive Details</label>
+                                <textarea class="form-control" name="description" rows="3" placeholder="Explain what volunteers will be doing and instructions..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-emerald btn-lg w-100 fw-bold rounded-pill shadow-sm">
+                                <i class="fas fa-paper-plane me-2"></i> Publish Drive to Map
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Location Map Picker -->
+                <div class="col-lg-6">
+                    <div class="card card-custom p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="fw-bold text-dark mb-0"><i class="fas fa-map-pin text-danger me-2"></i> Interactive Location Picker</h5>
+                            <span class="badge bg-light text-dark border">Click or Drag Pin</span>
+                        </div>
+                        <p class="text-muted small mb-2">Click or drag the pin. The green circle shows the geofence perimeter for check-in.</p>
+
+                        <!-- Address Search for Pin Placement -->
+                        <div class="input-group input-group-sm mb-2">
+                            <input type="text" id="picker-search-input" class="form-control" placeholder="Search address, landmark, or city to jump pin..." onkeydown="if(event.key==='Enter'){event.preventDefault();searchPickerAddress();}">
+                            <button class="btn btn-outline-dark" type="button" onclick="searchPickerAddress()"><i class="fas fa-search me-1"></i> Jump Pin</button>
+                            <button class="btn btn-emerald fw-bold" type="button" onclick="locatePickerToDeviceGPS()"><i class="fas fa-crosshairs me-1"></i> My Location</button>
+                        </div>
+
+                        <!-- Map Picker Container -->
+                        <div id="location-picker-map" class="map-picker-container mb-3" style="height: 380px; min-height: 380px; width: 100%; position: relative; z-index: 1;"></div>
+
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="row g-2 small font-monospace">
+                                <div class="col-6">
+                                    <span class="text-muted">Latitude:</span> <b id="display-lat">28.613900</b>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted">Longitude:</span> <b id="display-lng">77.209000</b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 3: IMPACT ANALYTICS & REACH ==================== -->
+        <div class="tab-pane fade" id="analytics-content" role="tabpanel">
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="strava-stat-card shadow-sm">
+                        <div class="text-uppercase fs-8 fw-bold mb-1 opacity-75">Aggregated Man-Hours</div>
+                        <div class="d-flex align-items-baseline gap-2 mb-2">
+                            <span class="strava-stat-val" id="ngo-hours-val">{{ ngo.total_man_hours_received|default:"148.5" }}</span>
+                            <span class="fs-4 fw-bold">hours</span>
+                        </div>
+                        <div class="small opacity-75"><i class="fas fa-stopwatch"></i> Total time donated to cause</div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card card-custom p-4 h-100">
+                        <div class="text-muted fs-8 fw-bold text-uppercase mb-1">Volunteers Engaged</div>
+                        <div class="fs-1 fw-extrabold text-primary mb-1">42</div>
+                        <div class="text-muted small"><i class="fas fa-users text-primary"></i> Unique community members</div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card card-custom p-4 h-100">
+                        <div class="text-muted fs-8 fw-bold text-uppercase mb-1">Drives Hosted</div>
+                        <div class="fs-1 fw-extrabold text-dark mb-1">18</div>
+                        <div class="text-muted small"><i class="fas fa-calendar-check text-success"></i> 2 active right now</div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card card-custom p-4 h-100">
+                        <div class="text-muted fs-8 fw-bold text-uppercase mb-1">Total Applications</div>
+                        <div class="fs-1 fw-extrabold text-warning mb-1">87</div>
+                        <div class="text-muted small"><i class="fas fa-hand-sparkles text-warning"></i> 94% confirmation rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drives Table -->
+            <div class="card card-custom p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3"><i class="fas fa-list-alt text-primary me-2"></i> Drive-by-Drive Impact History</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Drive Title</th>
+                                <th>Category</th>
+                                <th>Date</th>
+                                <th>Headcount</th>
+                                <th>Coordinates</th>
+                                <th>Hours Donated</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold">Yamuna River Clean-up & Plastic Segregation Drive</td>
+                                <td><span class="badge bg-success-subtle text-success">Environment</span></td>
+                                <td class="small text-muted">Today</td>
+                                <td>18 / 25 filled</td>
+                                <td class="small text-muted font-monospace">28.6500, 77.2410</td>
+                                <td class="fw-bold text-success"><i class="fas fa-stopwatch me-1"></i> 72.0 hrs</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Weekend Literacy & Fun Mentorship Camp</td>
+                                <td><span class="badge bg-primary-subtle text-primary">Education</span></td>
+                                <td class="small text-muted">Upcoming</td>
+                                <td>9 / 12 filled</td>
+                                <td class="small text-muted font-monospace">28.5880, 77.2250</td>
+                                <td class="fw-bold text-success"><i class="fas fa-stopwatch me-1"></i> 36.5 hrs</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Community Health & Nutrition Kit Distribution</td>
+                                <td><span class="badge bg-warning-subtle text-warning-emphasis">Health</span></td>
+                                <td class="small text-muted">Past</td>
+                                <td>15 / 15 filled</td>
+                                <td class="small text-muted font-monospace">28.6520, 77.1900</td>
+                                <td class="fw-bold text-success"><i class="fas fa-stopwatch me-1"></i> 40.0 hrs</td>
+                                <td><span class="badge bg-secondary">Completed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 4: ORGANIZATION MISSION & PROFILE ==================== -->
+        <div class="tab-pane fade" id="profile-content" role="tabpanel">
+            <div class="card card-custom p-4">
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <h4 class="fw-bold text-dark mb-2">About {{ ngo.organization_name|default:"Care India Foundation" }}</h4>
+                        <div class="badge-darpan mb-3"><i class="fas fa-shield-alt"></i> NITI Aayog Darpan ID: {{ ngo.darpan_id|default:"DL/2019/0182736" }}</div>
+
+                        <h6 class="fw-bold text-dark mt-3">Mission Statement</h6>
+                        <p class="text-muted">{{ ngo.mission_statement|default:"Dedicated to uplifting marginalized communities through quality education, environmental stewardship, and basic healthcare access." }}</p>
+
+                        <h6 class="fw-bold text-dark mt-3">History & Community Impact</h6>
+                        <p class="text-muted">{{ ngo.history_and_impact|default:"Founded in 2012, has organized over 120 community drives, engaged thousands of active youth volunteers, and restored urban environments." }}</p>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded border">
+                                    <div class="small text-muted">Official Email</div>
+                                    <div class="fw-bold text-dark">{{ ngo.contact_email|default:"contact@careindia.org" }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded border">
+                                    <div class="small text-muted">Official Phone</div>
+                                    <div class="fw-bold text-dark">{{ ngo.contact_phone|default:"+91 98112 34567" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card bg-light border p-3 rounded-3">
+                            <h6 class="fw-bold mb-2">Verification Credentials</h6>
+                            <p class="small text-muted mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> {{ ngo.address|default:"Connaught Place, New Delhi" }}</p>
+                            <div class="alert alert-success py-2 px-3 small mb-0">
+                                <i class="fas fa-check-circle me-1"></i> <b>NITI Aayog Registered</b><br>
+                                Verification Status: <b>Active / Verified</b><br>
+                                State Chapter: <b>Delhi (DL)</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize Live Tracker Map on load (Tab 1 is active!)
+        setTimeout(() => {
+            initNGOLiveTrackerMap(
+                'ngo-live-tracker-map',
+                {{ active_event.latitude|default:28.6500 }},
+                {{ active_event.longitude|default:77.2410 }},
+                {{ active_event.geofence_radius_meters|default:300 }},
+                "{{ active_event.title|default:'Yamuna River Clean-up Drive' }}"
+            );
+        }, 100);
+
+        // When Post Drive tab is shown, initialize Map Picker
+        const postTab = document.getElementById('post-drive-tab');
+        if (postTab) {
+            postTab.addEventListener('shown.bs.tab', () => {
+                setTimeout(() => {
+                    if (!locationPickerMap) {
+                        initLocationPickerMap('location-picker-map', 28.6139, 77.2090);
+                    } else {
+                        locationPickerMap.invalidateSize();
+                    }
+                }, 100);
+            });
+        }
+
+        // Default start/end dates
+        const now = new Date();
+        const start = new Date(now.getTime() + 24 * 3600000);
+        const end = new Date(now.getTime() + 28 * 3600000);
+        const startInput = document.getElementById('id_start_time');
+        const endInput = document.getElementById('id_end_time');
+        if (startInput) startInput.value = start.toISOString().slice(0, 16);
+        if (endInput) endInput.value = end.toISOString().slice(0, 16);
+    });
+
+    async function handleCreateDrive(e) {
+        e.preventDefault();
+        const form = e.target;
+        const btn = form.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Publishing Drive...';
+
+        const payload = {
+            title: form.title.value.trim(),
+            category: form.category.value,
+            headcount_needed: parseInt(form.headcount_needed.value),
+            required_skills: form.required_skills.value.split(',').map(s => s.trim()).filter(Boolean),
+            start_time: new Date(form.start_time.value).toISOString(),
+            end_time: new Date(form.end_time.value).toISOString(),
+            address: form.address.value.trim(),
+            latitude: parseFloat(form.latitude.value),
+            longitude: parseFloat(form.longitude.value),
+            geofence_radius_meters: parseInt(form.geofence_radius_meters.value),
+            description: form.description.value.trim(),
+            banner_image_url: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&auto=format&fit=crop&q=80'
+        };
+
+        try {
+            const res = await fetch('/api/events/create/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') || ''
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showToast("Drive successfully created and placed on the volunteer map!", "success");
+                form.reset();
+                setTimeout(() => {
+                    document.getElementById('live-tracking-tab').click();
+                }, 900);
+            } else {
+                alert(JSON.stringify(data.errors || data.error || 'Failed to create drive.'));
+                btn.disabled = false;
+                btn.innerHTML = 'Publish Drive to Map';
+            }
+        } catch (err) {
+            alert("Error: " + err.message);
+            btn.disabled = false;
+            btn.innerHTML = 'Publish Drive to Map';
+        }
+    }
+</script>
+{% endblock %}

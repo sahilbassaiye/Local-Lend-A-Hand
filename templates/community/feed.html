@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Community Feed & Reflections | Local Lend a Hand{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            {% if not is_authenticated %}
+                <!-- ==================== SIGN-IN GATEWAY FOR UNREGISTERED USERS ==================== -->
+                <div class="card card-custom p-5 text-center my-4 border-emerald-500 shadow-lg">
+                    <div class="avatar-circle-sm bg-emerald text-white mx-auto mb-3" style="width:64px;height:64px;font-size:1.75rem;">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 class="fw-extrabold text-dark mb-2">Members-Only Community Feed</h3>
+                    <p class="text-muted lead fs-6 mb-4">
+                        Please sign in as a <b>Volunteer</b> or <b>NGO</b> to access the live community feed, cheer on peers, and post your verified drive reflections.
+                    </p>
+
+                    <div class="p-4 bg-light rounded-4 border mb-4 text-start">
+                        <div class="fw-bold text-dark mb-2"><i class="fas fa-magic text-emerald me-2"></i> Instant Persona Access for Review:</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-emerald fw-bold rounded-pill px-4 py-2" onclick="switchDemoPersona('VOLUNTEER')">
+                                <i class="fas fa-user me-2"></i> Enter as Om Sharma (Volunteer)
+                            </button>
+                            <button class="btn btn-slate-pill text-white fw-bold px-4 py-2" onclick="switchDemoPersona('NGO')">
+                                <i class="fas fa-building me-2 text-amber"></i> Enter as Care India (NGO)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="/auth/login/" class="btn btn-outline-dark rounded-pill px-4 fw-bold">Sign In with Credentials</a>
+                        <a href="/auth/register/volunteer/" class="btn btn-outline-success rounded-pill px-4 fw-bold">Create Account</a>
+                    </div>
+                </div>
+
+            {% else %}
+                <!-- ==================== UNLOCKED COMMUNITY FEED FOR SIGNED-IN USERS ==================== -->
+                <!-- Feed Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h2 class="fw-extrabold text-dark mb-0">Community Timeline</h2>
+                            <span class="badge bg-emerald-subtle text-success fs-8"><i class="fas fa-check-circle"></i> Authenticated Access</span>
+                        </div>
+                        <p class="text-muted small mb-0">Live stories, reflections, and automated Strava Activity Cards from verified drives.</p>
+                    </div>
+                    <button class="btn btn-emerald fw-bold rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                        <i class="fas fa-feather-alt me-1"></i> Share Reflection
+                    </button>
+                </div>
+
+                <!-- Create Post Quick Card -->
+                <div class="card card-custom p-3 mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=60&auto=format&fit=crop&q=80" class="rounded-circle" width="44" height="44">
+                        <input type="text" class="form-control rounded-pill bg-light border-0 py-2 px-3" placeholder="Share your volunteering reflections or drive photos..." data-bs-toggle="modal" data-bs-target="#createPostModal">
+                    </div>
+                </div>
+
+                <!-- Feed Stream Container (populated by feed.js) -->
+                <div id="feed-container">
+                    <div class="text-center py-5">
+                        <div class="spinner-border spinner-border-sm text-success"></div>
+                        <p class="mt-2 text-muted small">Loading verified community activities...</p>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+{% if is_authenticated %}
+<!-- Create Post Modal -->
+<div class="modal fade" id="createPostModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="fas fa-feather-alt text-success me-2"></i> Share Reflection with Community</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="create-post-form">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Your Reflection / Story *</label>
+                        <textarea class="form-control" id="post-content" rows="4" required placeholder="What drive did you take part in? Share your reflections, teamwork moments, or community impact..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Photo URL (Optional)</label>
+                        <input type="url" class="form-control" id="post-media-url" placeholder="https://images.unsplash.com/...">
+                        <div class="form-text fs-8">Share a photo of the completed drive or team!</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-emerald fw-bold px-4 rounded-pill">
+                        <i class="fas fa-paper-plane me-1"></i> Post
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% if is_authenticated %}
+<script src="/static/js/feed.js"></script>
+{% endif %}
+{% endblock %}

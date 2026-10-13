@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ ngo.organization_name }} | Verified NGO Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card card-custom p-0 overflow-hidden mb-5">
+        <div class="bg-dark text-white p-5 position-relative" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <div class="d-inline-flex align-items-center gap-2 mb-2">
+                        <span class="badge-darpan fs-7"><i class="fas fa-shield-alt"></i> NITI Aayog NGO Darpan: {{ ngo.darpan_id }}</span>
+                        <span class="badge bg-success"><i class="fas fa-check-circle"></i> Government Verified</span>
+                    </div>
+                    <h1 class="display-5 fw-extrabold mb-1">{{ ngo.organization_name }}</h1>
+                    <p class="text-light opacity-75 mb-0"><i class="fas fa-map-marker-alt text-danger me-1"></i> {{ ngo.address }}</p>
+                </div>
+                <div class="text-end">
+                    <div class="fs-2 fw-extrabold text-success">{{ ngo.total_man_hours_received }} hrs</div>
+                    <div class="small text-light opacity-75">Total Man-Hours Donated</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-4 p-lg-5">
+            <div class="row g-5">
+                <div class="col-lg-8">
+                    <h4 class="fw-bold text-dark mb-3">Our Mission & Purpose</h4>
+                    <p class="lead text-muted">{{ ngo.mission_statement }}</p>
+
+                    <h4 class="fw-bold text-dark mt-5 mb-3">History & Community Track Record</h4>
+                    <p class="text-muted">{{ ngo.history_and_impact|default:"Dedicated to empowering grassroots communities and transforming local lives through selfless civic engagement." }}</p>
+
+                    <h4 class="fw-bold text-dark mt-5 mb-3">Upcoming Active Drives</h4>
+                    {% if active_events %}
+                        <div class="row g-3">
+                            {% for ev in active_events %}
+                            <div class="col-md-6">
+                                <div class="card border p-3 rounded-3 h-100">
+                                    <span class="badge bg-success-subtle text-success align-self-start mb-2">{{ ev.get_category_display }}</span>
+                                    <h6 class="fw-bold mb-1">{{ ev.title }}</h6>
+                                    <p class="small text-muted mb-2"><i class="fas fa-map-pin text-danger"></i> {{ ev.address|truncatechars:45 }}</p>
+                                    <div class="mt-auto d-flex justify-content-between align-items-center pt-2 border-top">
+                                        <small class="text-muted">{{ ev.headcount_applied }} / {{ ev.headcount_needed }} spots</small>
+                                        <a href="/volunteer/dashboard/" class="btn btn-sm btn-success rounded-pill px-3">Apply</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-light border">No upcoming drives posted at this moment. Check back soon!</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card bg-light border p-4 rounded-4">
+                        <h5 class="fw-bold text-dark mb-3"><i class="fas fa-address-card text-primary me-2"></i> Organization Contact</h5>
+                        <div class="mb-3">
+                            <label class="small text-muted fw-bold">Official Email</label>
+                            <div class="fw-semibold text-dark"><a href="mailto:{{ ngo.contact_email }}" class="text-decoration-none">{{ ngo.contact_email }}</a></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-muted fw-bold">Phone</label>
+                            <div class="fw-semibold text-dark">{{ ngo.contact_phone }}</div>
+                        </div>
+                        {% if ngo.website %}
+                        <div class="mb-3">
+                            <label class="small text-muted fw-bold">Website</label>
+                            <div><a href="{{ ngo.website }}" target="_blank" class="text-primary text-decoration-none">{{ ngo.website }}</a></div>
+                        </div>
+                        {% endif %}
+                        <div class="pt-3 border-top">
+                            <div class="badge bg-success-subtle text-success w-100 py-2 fs-7 fw-bold">
+                                <i class="fas fa-certificate me-1"></i> Verified on NITI Aayog Portal
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
